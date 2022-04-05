@@ -1,6 +1,6 @@
 ﻿ 
 @{
-    Object routes = ViewBag.routes;
+    var routeId = ViewBag.routeId;
 }
 <!DOCTYPE html>
 <head>
@@ -13,30 +13,36 @@
 
 <body class="container" ng-app="nodeModule" ng-controller="nodeController" ng-init="initApp()">
     <h2>@ViewBag.routeInfo.name</h2>
-    <table class="table-striped">
+    <table class="table-striped table">
         <tr>
             <th>Stoppage order</th>
             <th>Terminal</th>
-            <th></th>
         </tr>
         <tr ng-repeat="node in nodes">
             <td>{{node.stoppageIndex}}</td>
             <td>{{node.terminalName}}</td>
-        
+
         </tr>
     </table>
 </body>
 
 <script>
-    var datas=@ViewBag.routes
+    var routeId =@routeId ;
     let app = angular.module('nodeModule', [])
     app.controller('nodeController', ($scope, $http) => {
         $scope.nodes =[]
-
+        $scope.routeId = -1
        $scope.initApp = () => {
-            $scope.nodes=datas
+           $scope.routeId = routeId;
+           $scope.getNodes()
        }
-
+        $scope.getNodes = () => {
+            $http.get('/Node/getNodes/?routeId=' + $scope.routeId)
+                .then(({ data }) => {
+                    $scope.nodes = data;
+                    console.log(data)
+                })
+        }
     })
 </script>
 

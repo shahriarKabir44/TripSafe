@@ -24,9 +24,8 @@ namespace TripSafe.Controllers
         }
         public ActionResult viewDetails(int routeId)
         {
-            var datas = nodeRepository.getNodes(routeId);
             Route routeInfo = routeRepository.findRoute(routeId);
-            ViewBag.routes = datas;
+            ViewBag.routeId = routeId;
             ViewBag.routeInfo = routeInfo;
             return View();
         }
