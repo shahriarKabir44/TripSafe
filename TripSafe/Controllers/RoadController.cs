@@ -11,9 +11,11 @@ namespace TripSafe.Controllers
     public class RoadController : Controller
     {
         RoadRepository roadRepository;
+        TerminalConnectionRepository connectionRepository;
         public RoadController()
         {
             roadRepository = new RoadRepository();
+            connectionRepository = new TerminalConnectionRepository();
         }
         // GET: Road
         public ActionResult Index()
@@ -32,6 +34,12 @@ namespace TripSafe.Controllers
             var data = roadRepository.insertRoad(newRoad);
             return Json(data, JsonRequestBehavior.AllowGet);
 
+        }
+        [HttpPost]
+        public Object createConnection(TerminalConnection newConnection)
+        {
+            connectionRepository.create(newConnection);
+            return Json(new { data=1}, JsonRequestBehavior.AllowGet);
         }
     }
 }

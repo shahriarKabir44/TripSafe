@@ -37,7 +37,7 @@
 
         </select>
     </div>
-    <input type="number" ng-model="newRoadlength" />
+    <input type="text" ng-model="newRoadlength" />
     <input type="text" ng-model="newRoadname" />
     <button ng-click="submitData()">Add road</button>
 
@@ -115,40 +115,40 @@
             $scope.getDistricts()
            
          }
-        $scope.createNewRoad1 = async () => {
-            let { data } =  await $http.post('/Road/insert', JSON.stringify({
+        $scope.createNewRoad1 = async (roadId) => {
+
+            console.log(roadId)
+              await $http.post('/Road/createConnection', JSON.stringify({
                 terminal1: $scope.selectedTerminal1,
                 terminal2: $scope.selectedTerminal2,
-                name: $scope.newRoadname,
-                length: $scope.newRoadlength
+                roadId: roadId
             }))
             $scope.roads.push({
                 terminal1: $scope.selectedTerminal1,
                 terminal2: $scope.selectedTerminal2,
-                name: $scope.newRoadname,
+                Id: roadId,
                 length: $scope.newRoadlength,
-                Id:data.Id
+
+                name: $scope.newRoadname,
+                terminal1Name: $scope.terminals.filter(terminal => terminal.Id == $scope.selectedTerminal1)[0].name,
+                terminal2Name: $scope.terminals.filter(terminal => terminal.Id == $scope.selectedTerminal2)[0].name,
+
             })
         }
-        $scope.createNewRoad2 = async () => {
-            let {data }= await $http.post('/Road/insert', JSON.stringify({
+        $scope.createNewRoad2 = async (roadId) => {
+             await $http.post('/Road/createConnection', JSON.stringify({
                 terminal1: $scope.selectedTerminal2,
-                    terminal2:  $scope.selectedTerminal1,
-                name: $scope.newRoadname,
-                terminal1Name: $scope.terminals.filter(terminal => terminal.Id == $scope.selectedTerminal1)[0],
-                terminal2Name: $scope.terminals.filter(terminal => terminal.Id == $scope.selectedTerminal2)[0],
-
-                length: $scope.newRoadlength
+                terminal2:  $scope.selectedTerminal1,
+                roadId: roadId
             }))
             $scope.roads.push({
-                terminal1:  $scope.selectedTerminal2,
+                terminal1: $scope.selectedTerminal2,
                 terminal2: $scope.selectedTerminal1,
-                terminal1Name: $scope.terminals.filter(terminal => terminal.Id == $scope.selectedTerminal2)[0],
-                terminal2Name: $scope.terminals.filter(terminal => terminal.Id == $scope.selectedTerminal1)[0],
-
-                name: $scope.newRoadname,
                 length: $scope.newRoadlength,
-                Id: data.Id
+                Id: roadId,
+                terminal1Name: $scope.terminals.filter(terminal => terminal.Id == $scope.selectedTerminal2)[0].name,
+                terminal2Name: $scope.terminals.filter(terminal => terminal.Id == $scope.selectedTerminal1)[0].name,
+                name: $scope.newRoadname,
             })
 
         }
@@ -157,7 +157,20 @@
             $scope.roads=data
         }
         $scope.submitData = () => {
-            Promise.all([$scope.createNewRoad1(), $scope.createNewRoad2()])
+            $http.post('/Road/insert', JSON.stringify({
+                length: $scope.newRoadlength,
+                name: $scope.newRoadname
+            }))
+                .then(async ({ data }) => {
+                    console.log(data)
+                   await  $scope.createNewRoad1(data.Id),
+                    await   $scope.createNewRoad2(data.Id)
+                })
+                .then(() => {
+                    location.reload(true)
+                })
+                
+           
         }
     })
 </script>
