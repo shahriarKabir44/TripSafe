@@ -15,5 +15,114 @@ namespace TripSafe.Repositories
             this.constr = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
 
         }
+        public Route findRoute(int routeId)
+        {
+            Route route= new Route();
+            using (MySqlConnection con = new MySqlConnection(constr))
+            {
+                string query = "select * from route;";
+                using (MySqlCommand cmd = new MySqlCommand(query))
+                {
+                    using (MySqlCommand newCommand = new MySqlCommand(query))
+                    {
+                        newCommand.Connection = con;
+                        con.Open();
+                        using (MySqlDataReader sdr = newCommand.ExecuteReader())
+                        {
+                            while (sdr.Read())
+                            {
+                               route=(new Route
+                                {
+                                    Id = Convert.ToInt32(sdr["Id"]),
+                                    name = sdr["name"].ToString(),
+
+                                    start_terminal = Convert.ToInt32(sdr["start_terminal"].ToString()),
+                                    end_terminal = Convert.ToInt32(sdr["end_terminal"].ToString()),
+
+                                   
+                                }); ;
+                            }
+                        }
+                        con.Close();
+                    }
+
+                }
+            }
+            return route;
+        }
+        public List<Object> getRoutes()
+        {
+            List<Object> routes = new List<Object>();
+            using (MySqlConnection con = new MySqlConnection(constr))
+            {
+                string query = "select route.Id,name, (select name from terminal where terminal.Id = route.start_terminal) as startTerminalName, (select name from terminal where terminal.Id = route.end_terminal) as endTerminalName, route.start_terminal, route.end_terminal from route;";
+                using (MySqlCommand cmd = new MySqlCommand(query))
+                {
+                    using (MySqlCommand newCommand = new MySqlCommand(query))
+                    {
+                        newCommand.Connection = con;
+                        con.Open();
+                        using (MySqlDataReader sdr = newCommand.ExecuteReader())
+                        {
+                            while (sdr.Read())
+                            {
+                                routes.Add(new
+                                {
+                                    Id = Convert.ToInt32(sdr["Id"]),
+                                    name = sdr["name"].ToString(),
+
+                                    start_terminal = Convert.ToInt32( sdr["start_terminal"].ToString()),
+                                    end_terminal = Convert.ToInt32(sdr["end_terminal"].ToString()),
+
+                                    startTerminalName = sdr["startTerminalName"].ToString(),
+                                    endTerminalName = sdr["endTerminalName"].ToString(),
+
+                                    
+                                }); ;
+                            }
+                        }
+                        con.Close();
+                    }
+
+                }
+            }
+            return routes;
+        }
+        public Route create(Route newRoute)
+        {
+            using (MySqlConnection con = new MySqlConnection(constr))
+            {
+                string query = "INSERT INTO route( start_terminal,end_terminal,name)VALUES(?1,?2,?3);";
+                using (MySqlCommand cmd = new MySqlCommand(query))
+                {
+                    cmd.Connection = con;
+
+                    cmd.Parameters.AddWithValue("?1", newRoute.start_terminal);
+
+                    cmd.Parameters.AddWithValue("?2", newRoute.end_terminal);
+                    cmd.Parameters.AddWithValue("?3", newRoute.name);
+
+                    con.Open();
+                    int res = cmd.ExecuteNonQuery();
+                    con.Close();
+                    using (MySqlCommand newCommand = new MySqlCommand("select max(Id) from route"))
+                    {
+                        newCommand.Connection = con;
+                        con.Open();
+                        using (MySqlDataReader sdr = newCommand.ExecuteReader())
+                        {
+                            while (sdr.Read())
+                            {
+                                newRoute.Id = Convert.ToInt32(sdr["Id"]);
+                                 
+                            }
+                        }
+                        con.Close();
+                    }
+                    con.Close();
+                }
+            }
+            return newRoute;
+        }
      }
 }

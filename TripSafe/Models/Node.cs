@@ -7,7 +7,7 @@ namespace TripSafe.Models
 {
     public class Node
     {
-        public int routeIdId { get; set; }
+        public int routeId { get; set; }
         public int terminalId { get; set; }
         public int stoppageIndex { get; set; }
     }

@@ -177,18 +177,24 @@
     <Compile Include="Controllers\DistrictController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManagementController.cs" />
+    <Compile Include="Controllers\NodeController.cs" />
     <Compile Include="Controllers\RoadController.cs" />
+    <Compile Include="Controllers\RouteController.cs" />
     <Compile Include="Controllers\TerminalController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\District.cs" />
+    <Compile Include="Models\Node.cs" />
     <Compile Include="Models\Road.cs" />
+    <Compile Include="Models\Route.cs" />
     <Compile Include="Models\Terminal.cs" />
     <Compile Include="Models\TerminalConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\DistrictRepository.cs" />
+    <Compile Include="Repositories\NodeRepository.cs" />
     <Compile Include="Repositories\RoadRepository.cs" />
+    <Compile Include="Repositories\RouteRepository.cs" />
     <Compile Include="Repositories\TerminalConnectionRepository.cs" />
     <Compile Include="Repositories\TerminalRepository.cs" />
   </ItemGroup>
@@ -231,10 +237,13 @@
     <Content Include="Views\Home\EmployeeLogin.cshtml" />
     <Content Include="Views\Management\Index.cshtml" />
     <Content Include="Views\Road\Index.cshtml" />
+    <Content Include="Views\Route\Index.cshtml" />
+    <Content Include="Views\Route\viewDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\District\" />
+    <Folder Include="Views\Node\" />
     <Folder Include="Views\Terminal\" />
   </ItemGroup>
   <ItemGroup>
