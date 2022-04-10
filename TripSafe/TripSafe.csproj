@@ -188,13 +188,17 @@
     <Compile Include="Models\Node.cs" />
     <Compile Include="Models\Road.cs" />
     <Compile Include="Models\Route.cs" />
+    <Compile Include="Models\Schedule.cs" />
     <Compile Include="Models\Terminal.cs" />
     <Compile Include="Models\TerminalConnection.cs" />
+    <Compile Include="Models\Trip.cs" />
+    <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\DistrictRepository.cs" />
     <Compile Include="Repositories\NodeRepository.cs" />
     <Compile Include="Repositories\RoadRepository.cs" />
     <Compile Include="Repositories\RouteRepository.cs" />
+    <Compile Include="Repositories\ScheduleRepository.cs" />
     <Compile Include="Repositories\TerminalConnectionRepository.cs" />
     <Compile Include="Repositories\TerminalRepository.cs" />
   </ItemGroup>

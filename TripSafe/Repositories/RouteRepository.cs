@@ -55,7 +55,7 @@ namespace TripSafe.Repositories
             List<Object> routes = new List<Object>();
             using (MySqlConnection con = new MySqlConnection(constr))
             {
-                string query = "select route.Id,name, (select name from terminal where terminal.Id = route.start_terminal) as startTerminalName, (select name from terminal where terminal.Id = route.end_terminal) as endTerminalName, route.start_terminal, route.end_terminal from route;";
+                string query = "select route.Id,name,busId (select name from terminal where terminal.Id = route.start_terminal) as startTerminalName, (select name from terminal where terminal.Id = route.end_terminal) as endTerminalName, route.start_terminal, route.end_terminal from route;";
                 using (MySqlCommand cmd = new MySqlCommand(query))
                 {
                     using (MySqlCommand newCommand = new MySqlCommand(query))
@@ -76,8 +76,8 @@ namespace TripSafe.Repositories
 
                                     startTerminalName = sdr["startTerminalName"].ToString(),
                                     endTerminalName = sdr["endTerminalName"].ToString(),
+                                    busId= sdr["busId"].ToString()
 
-                                    
                                 }); ;
                             }
                         }
@@ -92,7 +92,7 @@ namespace TripSafe.Repositories
         {
             using (MySqlConnection con = new MySqlConnection(constr))
             {
-                string query = "INSERT INTO route( start_terminal,end_terminal,name)VALUES(?1,?2,?3);";
+                string query = "INSERT INTO route( start_terminal,end_terminal,name, busId )VALUES(?1,?2,?3,?4);";
                 using (MySqlCommand cmd = new MySqlCommand(query))
                 {
                     cmd.Connection = con;
@@ -101,6 +101,8 @@ namespace TripSafe.Repositories
 
                     cmd.Parameters.AddWithValue("?2", newRoute.end_terminal);
                     cmd.Parameters.AddWithValue("?3", newRoute.name);
+
+                    cmd.Parameters.AddWithValue("?4", newRoute.busId);
 
                     con.Open();
                     int res = cmd.ExecuteNonQuery();

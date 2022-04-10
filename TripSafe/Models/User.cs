@@ -8,8 +8,7 @@ namespace TripSafe.Models
     public class User
     {
         public int Id { get; set; }
-        public String name { get; set; }
-        public String phoneNumber { get; set; }
-
+        public string name { get; set; }
+        public string phoneNumber { get; set; }
     }
 }

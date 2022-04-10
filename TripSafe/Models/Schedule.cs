@@ -5,11 +5,11 @@ using System.Web;
 
 namespace TripSafe.Models
 {
-    public class Trip
+    public class Schedule
     {
-        public int Id { get; set; }
-        public int driverId { get; set; }
+        public int terminalId { get; set; }
         public int routeId { get; set; }
-        public int date { get; set; }
+        public int departureTime { get; set; }
+        public int arrivalTime { get; set; }
     }
 }
