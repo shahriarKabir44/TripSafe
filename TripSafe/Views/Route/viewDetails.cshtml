@@ -1,6 +1,7 @@
-﻿ 
+﻿
 @{
     var routeId = ViewBag.routeId;
+    var busId = ViewBag.busId;
 }
 <!DOCTYPE html>
 <head>
@@ -13,36 +14,83 @@
 
 <body class="container" ng-app="nodeModule" ng-controller="nodeController" ng-init="initApp()">
     <h2>@ViewBag.routeInfo.name</h2>
+
+    <h4>Bus info:</h4>
+    <table class="table table-striped">
+        <tr>
+            <th>Name</th>
+            <td>{{currentBus.name}} </td>
+        </tr>
+        <tr>
+            <th>capacity</th>
+            <td>{{currentBus.capacity}} </td>
+        </tr>
+        <tr>
+            <th>status</th>
+            <td>{{currentBus.status}} </td>
+        </tr>
+        <tr>
+            <th>Remaining vacancy</th>
+            <td>{{currentBus.rem_vacancy}} </td>
+        </tr>
+         
+    </table>
+    <br />
+    <h2>Route Info</h2>
     <table class="table-striped table">
         <tr>
             <th>Stoppage order</th>
             <th>Terminal</th>
+            <th>Arrival time</th>
+            <th>Departure time</th>
         </tr>
-        <tr ng-repeat="node in nodes">
-            <td>{{node.stoppageIndex}}</td>
-            <td>{{node.terminalName}}</td>
-
+        <tr ng-repeat="schedule in schedules">
+            <td>{{schedule.stoppageIndex}}</td>
+            <td>{{schedule.terminalName}}</td>
+            <td>{{ schedule.arrivalTime }}</td>
+            <td> {{ schedule.departureTime }}</td>
         </tr>
     </table>
 </body>
 
 <script>
     var routeId =@routeId ;
+    var busId=@busId;
+    
     let app = angular.module('nodeModule', [])
     app.controller('nodeController', ($scope, $http) => {
-        $scope.nodes =[]
+        
+        $scope.schedules = []
+        $scope.currentBus = {}
         $scope.routeId = -1
+        $scope.busId=-1
        $scope.initApp = () => {
            $scope.routeId = routeId;
+           $scope.busId = busId
            $scope.getNodes()
-       }
-        $scope.getNodes = () => {
-            $http.get('/Node/getNodes/?routeId=' + $scope.routeId)
+           $scope.findBus()
+        }
+        $scope.convertTime = function (time) {
+            return Math.floor(time / 60) + ":" + Math.floor(time%60)
+        }
+        $scope.findBus = () => {
+            $http.get('/Bus/findBus/?busId=' + $scope.busId)
                 .then(({ data }) => {
-                    $scope.nodes = data;
+                    $scope.currentBus = data;
                     console.log(data)
                 })
         }
+        $scope.getNodes = () => {
+            $http.get('/Schedule/findByRoute/?routeId=' + $scope.routeId)
+                .then(({ data }) => {
+                    for (let item of data) {
+                        item.arrivalTime = $scope.convertTime(item.arrivalTime)
+                        item.departureTime = $scope.convertTime(item.departureTime)
+                    }
+                    $scope.schedules = data;
+                })
+        }
+         
     })
 </script>
 

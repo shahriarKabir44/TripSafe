@@ -6,43 +6,51 @@ using TripSafe.Models;
 using System.Configuration;
 using MySql.Data.MySqlClient;
 
-
 namespace TripSafe.Repositories
 {
-    public class NodeRepository
+    public class ScheduleRepository
     {
         private string constr;
-        public NodeRepository()
+        public ScheduleRepository()
         {
             this.constr = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
 
         }
-        public void insert(Node newNode)
+        public void insert(Schedule schedule)
         {
+
+
             using (MySqlConnection con = new MySqlConnection(constr))
             {
-                string query = "INSERT INTO node (routeId,terminalId,stoppageIndex)VALUES(?1,?2,?3);";
-
+                string query = "INSERT INTO  schedule (terminalId,routeId,arrivalTime,departureTime)VALUES(?1,?2,?3,?4);";
                 using (MySqlCommand cmd = new MySqlCommand(query))
                 {
                     cmd.Connection = con;
 
-                    cmd.Parameters.AddWithValue("?1", newNode.routeId);
+                    cmd.Parameters.AddWithValue("?1", schedule.terminalId);
 
-                    cmd.Parameters.AddWithValue("?2", newNode.terminalId);
-                    cmd.Parameters.AddWithValue("?3", newNode.stoppageIndex);
+                    cmd.Parameters.AddWithValue("?2", schedule.routeId);
+                    cmd.Parameters.AddWithValue("?3", schedule.arrivalTime);
+
+                    cmd.Parameters.AddWithValue("?4", schedule.departureTime);
+
                     con.Open();
                     int res = cmd.ExecuteNonQuery();
                     con.Close();
+
                 }
             }
+
         }
-        public List<Object> getNodes(int routeId)
+
+        // todo: add many queries
+
+        public List<Object> getMany(string query)
         {
-            List<Object> nodes = new List<Object>();
+            List<Object> schedules = new List<Object>();
             using (MySqlConnection con = new MySqlConnection(constr))
             {
-                string query = $"select routeId, terminalId,stoppageIndex, (select name from terminal where terminal.Id= terminalid) as terminalName from node where routeId= {routeId}  order by stoppageIndex;";
+                 
                 using (MySqlCommand cmd = new MySqlCommand(query))
                 {
                     using (MySqlCommand newCommand = new MySqlCommand(query))
@@ -53,14 +61,14 @@ namespace TripSafe.Repositories
                         {
                             while (sdr.Read())
                             {
-                                nodes.Add(new
+                                schedules.Add(new 
                                 {
-                                    Id = Convert.ToInt32(sdr["routeId"]),
                                     terminalId = Convert.ToInt32(sdr["terminalId"]),
+                                    routeId = Convert.ToInt32(sdr["routeId"]),
+                                    arrivalTime = Convert.ToInt32(sdr["arrivalTime"]),
+                                    departureTime = Convert.ToInt32(sdr["departureTime"]),
                                     stoppageIndex = Convert.ToInt32(sdr["stoppageIndex"]),
-
-                                    terminalName = sdr["terminalName"].ToString(),
-                                     
+                                    terminalName= sdr["terminalName"].ToString()
                                 }); ;
                             }
                         }
@@ -69,7 +77,9 @@ namespace TripSafe.Repositories
 
                 }
             }
-            return nodes;
+            return schedules;
         }
+
+
     }
 }

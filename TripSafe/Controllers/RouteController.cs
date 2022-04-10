@@ -11,11 +11,11 @@ namespace TripSafe.Controllers
     public class RouteController : Controller
     {
         private RouteRepository routeRepository;
-        private NodeRepository nodeRepository;
+        private ScheduleRepository scheduleRepository;
         public RouteController()
         {
             routeRepository = new RouteRepository();
-            nodeRepository = new NodeRepository();
+            scheduleRepository = new ScheduleRepository();
         }
         // GET: Route
         public ActionResult Index()
@@ -26,6 +26,7 @@ namespace TripSafe.Controllers
         {
             Route routeInfo = routeRepository.findRoute(routeId);
             ViewBag.routeId = routeId;
+            ViewBag.busId = routeInfo.busId;
             ViewBag.routeInfo = routeInfo;
             return View();
         }

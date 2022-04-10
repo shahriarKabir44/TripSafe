@@ -11,5 +11,6 @@ namespace TripSafe.Models
         public String name { get; set; }
         public int start_terminal { get; set; }
         public int end_terminal { get; set; }
+        public int busId { get; set; }
     }
 }
