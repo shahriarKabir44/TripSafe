@@ -50,7 +50,7 @@ namespace TripSafe.Repositories
             List<Object> schedules = new List<Object>();
             using (MySqlConnection con = new MySqlConnection(constr))
             {
-                 
+
                 using (MySqlCommand cmd = new MySqlCommand(query))
                 {
                     using (MySqlCommand newCommand = new MySqlCommand(query))
@@ -61,14 +61,15 @@ namespace TripSafe.Repositories
                         {
                             while (sdr.Read())
                             {
-                                schedules.Add(new 
+                                schedules.Add(new
                                 {
                                     terminalId = Convert.ToInt32(sdr["terminalId"]),
                                     routeId = Convert.ToInt32(sdr["routeId"]),
                                     arrivalTime = Convert.ToInt32(sdr["arrivalTime"]),
                                     departureTime = Convert.ToInt32(sdr["departureTime"]),
-                                    stoppageIndex = Convert.ToInt32(sdr["stoppageIndex"]),
-                                    terminalName= sdr["terminalName"].ToString()
+                                    routeName = sdr["routeName"].ToString(),
+                                    terminalName = sdr["terminalName"].ToString(),
+
                                 }); ;
                             }
                         }

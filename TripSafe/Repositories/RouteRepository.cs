@@ -17,7 +17,7 @@ namespace TripSafe.Repositories
         }
         public Route findRoute(int routeId)
         {
-            Route route= new Route();
+            Route route = new Route();
             using (MySqlConnection con = new MySqlConnection(constr))
             {
                 string query = "select * from route;";
@@ -31,16 +31,16 @@ namespace TripSafe.Repositories
                         {
                             while (sdr.Read())
                             {
-                               route=(new Route
+                                route = (new Route
                                 {
                                     Id = Convert.ToInt32(sdr["Id"]),
                                     name = sdr["name"].ToString(),
 
-                                    start_terminal = Convert.ToInt32(sdr["start_terminal"] ),
-                                    end_terminal = Convert.ToInt32(sdr["end_terminal"]) ,
-                                    busId= Convert.ToInt32(sdr["busId"] )
+                                    start_terminal = Convert.ToInt32(sdr["start_terminal"]),
+                                    end_terminal = Convert.ToInt32(sdr["end_terminal"]),
+                                    busId = Convert.ToInt32(sdr["busId"])
 
-                               }); ;
+                                }); ;
                             }
                         }
                         con.Close();
@@ -55,7 +55,7 @@ namespace TripSafe.Repositories
             List<Object> routes = new List<Object>();
             using (MySqlConnection con = new MySqlConnection(constr))
             {
-                string query = "select route.Id,name,busId, (select name from terminal where terminal.Id = route.start_terminal) as startTerminalName, (select name from terminal where terminal.Id = route.end_terminal) as endTerminalName, route.start_terminal, route.end_terminal from route;";
+                string query = "select route.Id,name,busId (select name from terminal where terminal.Id = route.start_terminal) as startTerminalName, (select name from terminal where terminal.Id = route.end_terminal) as endTerminalName, route.start_terminal, route.end_terminal from route;";
                 using (MySqlCommand cmd = new MySqlCommand(query))
                 {
                     using (MySqlCommand newCommand = new MySqlCommand(query))
@@ -75,12 +75,12 @@ namespace TripSafe.Repositories
                                     end_terminal = Convert.ToInt32(sdr["end_terminal"].ToString()),
 
                                     startTerminalName = sdr["startTerminalName"].ToString(),
-                                    endTerminalName = sdr["endTerminalName"].ToString(),
+                                    endTerminalName = sdr["endTerminaName"].ToString(),
                                     busId= sdr["busId"].ToString()
 
                                 }); ;
                             }
-                        }
+                        } 
                         con.Close();
                     }
 
@@ -120,7 +120,7 @@ namespace TripSafe.Repositories
                             }
                         }
                         con.Close();
-                    }
+
                     con.Close();
                 }
             }

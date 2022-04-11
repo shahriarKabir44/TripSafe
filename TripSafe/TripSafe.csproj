@@ -192,7 +192,10 @@
     <Compile Include="Models\Schedule.cs" />
     <Compile Include="Models\Terminal.cs" />
     <Compile Include="Models\TerminalConnection.cs" />
+<<<<<<< HEAD
     <Compile Include="Models\Ticket.cs" />
+=======
+>>>>>>> 2546928ba7a2853dc7578d3a0e3913b4f8dbfaf5
     <Compile Include="Models\Trip.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
