@@ -67,7 +67,7 @@ namespace TripSafe.Repositories
                                     routeId = Convert.ToInt32(sdr["routeId"]),
                                     arrivalTime = Convert.ToInt32(sdr["arrivalTime"]),
                                     departureTime = Convert.ToInt32(sdr["departureTime"]),
-                                    routeName = sdr["routeName"].ToString(),
+                                    stoppageIndex = Convert.ToInt32(sdr["stoppageIndex"]),
                                     terminalName = sdr["terminalName"].ToString(),
 
                                 }); ;
