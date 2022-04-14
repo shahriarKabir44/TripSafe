@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.Mvc;
+
 using TripSafe.Models;
 using TripSafe.Repositories;
 
@@ -21,7 +21,11 @@ namespace TripSafe.Controllers
         {
             return View();
         }
-
+        [HttpGet]
+        public Object getUnAssignedBuses()
+        {
+            return Json(this.busRepository.findUnassignedBus(), JsonRequestBehavior.AllowGet);
+        }
         [HttpGet]
         public Object findBus(int busId)
         {

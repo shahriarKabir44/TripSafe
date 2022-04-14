@@ -33,5 +33,44 @@ namespace TripSafe.Repositories
                 }
             }
         }
+   
+        public Object getAll()
+        {
+            List<Object> connections = new List<Object>();
+            using (MySqlConnection con = new MySqlConnection(constr))
+            {
+                string query = "select terminal1,terminal2,roadId,(select name from terminal where terminal.Id=terminal_connection.terminal1) as terminal1Name, (select name from terminal where terminal.Id=terminal_connection.terminal2) as terminal2Name,(select name from road where road.Id=terminal_connection.roadId) as roadName from terminal_connection;";
+                using (MySqlCommand cmd = new MySqlCommand(query))
+                {
+                    using (MySqlCommand newCommand = new MySqlCommand(query))
+                    {
+                        newCommand.Connection = con;
+                        con.Open();
+                        using (MySqlDataReader sdr = newCommand.ExecuteReader())
+                        {
+                            while (sdr.Read())
+                            {
+                                connections.Add(new
+                                {
+                                    terminal1 = Convert.ToInt32(sdr["terminal1"]),
+                                    terminal2 = Convert.ToInt32(sdr["terminal2"]),
+                                    roadId = Convert.ToInt32(sdr["roadId"]),
+                                     
+
+                                    terminal1Name = sdr["terminal1Name"].ToString(),
+                                    terminal2Name = sdr["terminal2Name"].ToString(),
+
+                                    roadName = sdr["roadName"].ToString()
+                                }); ;
+                            }
+                        }
+                        con.Close();
+                    }
+
+                }
+            }
+            return connections;
+        }
+    
     }
 }

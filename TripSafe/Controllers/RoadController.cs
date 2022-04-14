@@ -41,5 +41,10 @@ namespace TripSafe.Controllers
             connectionRepository.create(newConnection);
             return Json(new { data=1}, JsonRequestBehavior.AllowGet);
         }
+        [HttpGet]
+        public Object getAllConnections()
+        {
+            return   Json(connectionRepository.getAll(), JsonRequestBehavior.AllowGet);
+        }
     }
 }
