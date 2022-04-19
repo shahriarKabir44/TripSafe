@@ -22,7 +22,7 @@ namespace TripSafe.Repositories
 
             using (MySqlConnection con = new MySqlConnection(constr))
             {
-                string query = "INSERT INTO  schedule (terminalId,routeId,arrivalTime,departureTime)VALUES(?1,?2,?3,?4);";
+                string query = "INSERT INTO  schedule (terminalId,routeId,arrivalTime,departureTime,stoppageIndex)VALUES(?1,?2,?3,?4,?5);";
                 using (MySqlCommand cmd = new MySqlCommand(query))
                 {
                     cmd.Connection = con;
@@ -33,6 +33,7 @@ namespace TripSafe.Repositories
                     cmd.Parameters.AddWithValue("?3", schedule.arrivalTime);
 
                     cmd.Parameters.AddWithValue("?4", schedule.departureTime);
+                    cmd.Parameters.AddWithValue("?5", schedule.stoppageIndex);
 
                     con.Open();
                     int res = cmd.ExecuteNonQuery();

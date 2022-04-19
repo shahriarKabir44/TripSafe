@@ -11,5 +11,6 @@ namespace TripSafe.Models
         public int routeId { get; set; }
         public int departureTime { get; set; }
         public int arrivalTime { get; set; }
+        public int stoppageIndex { get; set; }
     }
 }

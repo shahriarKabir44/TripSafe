@@ -44,7 +44,14 @@
         </div>
     </div>
 
+    <label for="bus_name">Bus name</label>
+    <select name="bus_name" ng-model="newRoute.busId">
+        <option ng-repeat="bus in availableBusList" value="{{bus.Id}}">{{bus.name}} </option>
 
+    </select>
+    <label for="routeName">Route name</label>
+
+    <input name="routeName" type="text" ng-model="newRoute.name" />
 
     <table class="table table-striped">
         <thead>
@@ -53,7 +60,7 @@
         <tbody>
             <tr ng-repeat="entry in entries">
                 <td>
-                    <select  ng-model="entry.terminalId">
+                    <select ng-model="entry.terminalId">
                         <option ng-repeat="terminal in terminals" value="{{terminal.Id}}">{{terminal.name}} </option>
                     </select>
                 </td>
@@ -67,6 +74,7 @@
         </tbody>
     </table>
     <button class="btn btn-primary" ng-click="addNew()">add</button>
+    <button class="btn btn-success" ng-click="done()">Done </button>
 </body>
 
 <script>
@@ -85,7 +93,7 @@
         $scope.availableBusList = []
         $scope.connections = []
         $scope.entries = [{
-            stoppageIndex: 0,
+            stoppageIndex: 1,
             arrivalTime: 0,
             departureTime: 0,
             terminalId: 0
@@ -97,7 +105,7 @@
         $scope.doesAnomalyExist = false
         $scope.addNew = function () {
 
-            $scope.checkAnomaly()
+          
             $scope.dataList.push($scope.dataList.length)
             $scope.entries.push({
                 stoppageIndex: $scope.entries.length + 1,
@@ -112,11 +120,11 @@
             for (let n = 1; n < $scope.entries.length; n++) {
 
                 if (!$scope.findRoad($scope.entries[n - 1].terminalId, $scope.entries[n].terminalId)) {
-                    console.log("here!")
+                   
                     $scope.doesAnomalyExist = true
                     $scope.terminal1 = $scope.terminals.filter(terminal => terminal.Id = $scope.entries[n - 1].terminalId)[0]
                     $scope.terminal2 = $scope.terminals.filter(terminal => terminal.Id = $scope.entries[n].terminalId)[0]
-                    console.log($scope.entries )
+                   
 
                     $('#unConnectedModal').modal('show')
                 }
@@ -124,11 +132,44 @@
         }
 
         $scope.findRoad = function (terminal1, terminal2) {
-            console.log(terminal1, terminal2)
+            
             for (let connection of $scope.connections) {
                 if (connection.terminal1 == terminal1 && connection.terminal2 == terminal2) return true;
             }
             return false
+        }
+        $scope.newRoute = {}
+        $scope.done = function () {
+            $scope.newRoute.start_terminal = $scope.entries[0].terminalId
+            $scope.newRoute.end_terminal = $scope.entries[$scope.entries.length - 1].terminalId
+            console.log($scope.newRoute)
+            console.log($scope.entries)
+            $http.post('/Route/insert', JSON.stringify($scope.newRoute))
+                .then(({ data}) => {
+                    let newRouteId = data.Id
+                   
+                    let promises = []
+                    for (let entry of $scope.entries) {
+                        console.log({
+                            stoppageIndex: entry.stoppageIndex,
+                            arrivalTime: entry.arrivalTime,
+                            departureTime: entry.departureTime,
+                            terminalId: entry.terminalId,
+                            routeId: newRouteId
+                        })
+                        promises.push($http.post('/Schedule/insert', JSON.stringify({
+                            stoppageIndex: entry.stoppageIndex,
+                            arrivalTime: entry.arrivalTime,
+                            departureTime: entry.departureTime,
+                            terminalId: entry.terminalId,
+                            routeId: newRouteId
+                        })))
+                    }
+                    return Promise.all(promises)
+                })
+                .then(() => {
+                    location.href ="Route/Index"
+                })
         }
 
         $scope.initApp = () => {

@@ -21,6 +21,13 @@ namespace TripSafe.Controllers
             return View();
         }
 
+        [HttpPost]
+        public object insert(Schedule schedule)
+        {
+            scheduleRepository.insert(schedule);
+            return Json(new { data = 1 }, JsonRequestBehavior.AllowGet);
+        }
+
         [HttpGet]
         public object findByRoute(int routeId)
         {

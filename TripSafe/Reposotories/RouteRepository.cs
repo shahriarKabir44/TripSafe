@@ -107,7 +107,7 @@ namespace TripSafe.Repositories
                     con.Open();
                     int res = cmd.ExecuteNonQuery();
                     con.Close();
-                    using (MySqlCommand newCommand = new MySqlCommand("select max(Id) from route"))
+                    using (MySqlCommand newCommand = new MySqlCommand("select max(Id) as Id from route;"))
                     {
                         newCommand.Connection = con;
                         con.Open();
