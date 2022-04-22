@@ -163,6 +163,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\BusController.cs" />
     <Compile Include="Controllers\DistrictController.cs" />
+    <Compile Include="Controllers\EmployeeController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManagementController.cs" />
     <Compile Include="Controllers\RoadController.cs" />
@@ -172,8 +173,11 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\AccidentRecords.cs" />
     <Compile Include="Models\Bus.cs" />
     <Compile Include="Models\District.cs" />
+    <Compile Include="Models\Employee.cs" />
+    <Compile Include="Models\Maintenance.cs" />
     <Compile Include="Models\Road.cs" />
     <Compile Include="Models\Route.cs" />
     <Compile Include="Models\Schedule.cs" />
@@ -185,6 +189,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reposotories\BusRepository.cs" />
     <Compile Include="Reposotories\DistrictRepository.cs" />
+    <Compile Include="Reposotories\EmployeeRepository.cs" />
     <Compile Include="Reposotories\RoadRepository.cs" />
     <Compile Include="Reposotories\RouteRepository.cs" />
     <Compile Include="Reposotories\ScheduleRepository.cs" />
@@ -238,6 +243,7 @@
     <Content Include="Views\Route\createRoute.cshtml" />
     <Content Include="Views\Bus\Index.cshtml" />
     <Content Include="Views\Terminal\Index.cshtml" />
+    <Content Include="Views\Employee\Index.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
