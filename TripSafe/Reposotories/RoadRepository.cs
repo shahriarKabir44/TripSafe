@@ -21,7 +21,14 @@ namespace TripSafe.Repositories
             List<Object> roads = new List<Object>();
             using (MySqlConnection con = new MySqlConnection(constr))
             {
-                string query = "select road.Id, road.name,road.length, T.name as terminal1Name, S.name as terminal2Name from road, terminal as T, terminal as S, terminal_connection where terminal_connection.roadId= road.Id and terminal_connection.terminal1=T.Id and terminal_connection.terminal2=S.Id;";
+                string query = @"select road.Id, road.name,road.length, 
+                                    T.name as terminal1Name,
+                                    S.name as terminal2Name from road, 
+                                    terminal as T, terminal as S, 
+                                    terminal_connection where 
+                                    terminal_connection.roadId= road.Id and 
+                                    terminal_connection.terminal1=T.Id and 
+                                    terminal_connection.terminal2=S.Id;";
                 using (MySqlCommand cmd = new MySqlCommand(query))
                 {
                     using (MySqlCommand newCommand = new MySqlCommand(query))

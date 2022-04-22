@@ -88,38 +88,49 @@ namespace TripSafe.Repositories
             return newBus;
         }
 
+        public void update(Bus bus)
+        {
+            using (MySqlConnection con = new MySqlConnection(constr))
+            {
+                using (MySqlCommand newCommand = new MySqlCommand($@"update bus set status={bus.status}
+                                    where bus.id = {bus.Id}; "))
+                {
+                    newCommand.Connection = con;
+                    con.Open();
+                    con.Close();
+                }
 
-        public List<Bus> findUnassignedBus()
+            }
+        }
+
+
+        public List<Bus> findAllBus(String query)
         {
             List<Bus> buses = new List<Bus>();
             using (MySqlConnection con = new MySqlConnection(constr))
             {
-                string query = $"select * from bus where bus.id not in (select route.busId from route);";
-                using (MySqlCommand cmd = new MySqlCommand(query))
+                using (MySqlCommand newCommand = new MySqlCommand(query))
                 {
-                    using (MySqlCommand newCommand = new MySqlCommand(query))
+                    newCommand.Connection = con;
+                    con.Open();
+                    using (MySqlDataReader sdr = newCommand.ExecuteReader())
                     {
-                        newCommand.Connection = con;
-                        con.Open();
-                        using (MySqlDataReader sdr = newCommand.ExecuteReader())
+                        while (sdr.Read())
                         {
-                            while (sdr.Read())
+                            buses.Add(new Bus
                             {
-                                buses.Add(new Bus
-                                {
-                                    Id = Convert.ToInt32(sdr["Id"]),
-                                    name = sdr["name"].ToString(),
-                                    status = sdr["status"].ToString(),
-                                    capacity = Convert.ToInt32(sdr["capacity"]),
-                                    isActive = Convert.ToInt32(sdr["isActive"]),
-                                    rem_vacancy = Convert.ToInt32(sdr["rem_vacancy"])
-                                });
-                            }
+                                Id = Convert.ToInt32(sdr["Id"]),
+                                name = sdr["name"].ToString(),
+                                status = sdr["status"].ToString(),
+                                capacity = Convert.ToInt32(sdr["capacity"]),
+                                isActive = Convert.ToInt32(sdr["isActive"]),
+                                rem_vacancy = Convert.ToInt32(sdr["rem_vacancy"])
+                            });
                         }
-                        con.Close();
                     }
-
+                    con.Close();
                 }
+
             }
             return buses;
         }

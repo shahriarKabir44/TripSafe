@@ -21,10 +21,22 @@ namespace TripSafe.Controllers
         {
             return View();
         }
+        [HttpPost]
+        public Object update(Bus newBus)
+        {
+            busRepository.update(newBus);
+            return Json(new { status = 1 }, JsonRequestBehavior.AllowGet);
+        }
+        [HttpGet]
+        public Object getAllBusList()
+        {
+            return Json(this.busRepository.findAllBus($"select * from bus;"), JsonRequestBehavior.AllowGet);
+
+        }
         [HttpGet]
         public Object getUnAssignedBuses()
         {
-            return Json(this.busRepository.findUnassignedBus(), JsonRequestBehavior.AllowGet);
+            return Json(this.busRepository.findAllBus($"select * from bus where bus.id not in (select route.busId from route);"), JsonRequestBehavior.AllowGet);
         }
         [HttpGet]
         public Object findBus(int busId)

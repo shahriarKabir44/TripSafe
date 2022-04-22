@@ -154,6 +154,7 @@
         }
         $scope.getRoads = async () => {
             let { data } = await $http.get('/Road/getRoads')
+            console.log(data)
             $scope.roads=data
         }
         $scope.submitData = () => {

@@ -190,6 +190,7 @@
     <Compile Include="Reposotories\ScheduleRepository.cs" />
     <Compile Include="Reposotories\TerminalConnectionRepository.cs" />
     <Compile Include="Reposotories\TerminalRepository.cs" />
+    <Compile Include="Reposotories\TicketRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />
@@ -235,6 +236,7 @@
     <Content Include="Content\bootstrap-theme.css.map" />
     <None Include="packages.config" />
     <Content Include="Views\Route\createRoute.cshtml" />
+    <Content Include="Views\Bus\Index.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
