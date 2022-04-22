@@ -29,16 +29,7 @@
         </div>
     </div>
 
-    <label for="bus_name">Bus name</label>
-    <select name="bus_name" ng-model="newRoute.busId">
-        <option ng-repeat="bus in availableBusList" value="{{bus.Id}}">{{bus.name}} </option>
-
-    </select>
-    <label for="routeName">Route name</label>
-
-    <input name="routeName" type="text" ng-model="newRoute.name" />
-    <button class="btn btn-primary" ng-click="addNew()">add</button>
-
+     
     <table class="table table-striped">
         <thead>
             <tr><th>Bus name</th> <th>Capacity</th> <th>Remaining capacity</th> <th>Status</th><th>Action</th> </tr>

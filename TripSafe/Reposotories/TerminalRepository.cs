@@ -17,12 +17,64 @@ namespace TripSafe.Repositories
             this.constr = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
 
         }
-        public List<Terminal> getTerminals()
+        public Terminal addNew(Terminal terminal)
         {
-            List<Terminal> terminals = new List<Terminal>();
             using (MySqlConnection con = new MySqlConnection(constr))
             {
-                string query = "SELECT * FROM terminal";
+                string query = $@"INSERT INTO  terminal 
+                                    ( 
+                                     name ,
+                                     districtId )
+                                    VALUES
+                                    ( {terminal.name},{terminal.districtId}  );";
+                using (MySqlCommand cmd = new MySqlCommand(query))
+                {
+                    cmd.Connection = con;
+                    con.Open();
+                    con.Close();
+                    using (MySqlCommand newCommand = new MySqlCommand("select max(ID) from terminal;"))
+                    {
+                        newCommand.Connection = con;
+                        con.Open();
+                        using (MySqlDataReader sdr = newCommand.ExecuteReader())
+                        {
+                            while (sdr.Read())
+                            {
+                                terminal.Id = Convert.ToInt32(sdr["Id"]);
+                            }
+                        }
+                        con.Close();
+                    }
+
+                }
+            }
+            return terminal;
+        }
+        public void delete(Terminal terminal)
+        {
+            using (MySqlConnection con = new MySqlConnection(constr))
+            {
+                string query = $@"delete from terminal 
+                                where terminal.Id={terminal.Id};";
+                using (MySqlCommand cmd = new MySqlCommand(query))
+                {
+                    using (MySqlCommand newCommand = new MySqlCommand(query))
+                    {
+                        newCommand.Connection = con;
+                        con.Open();
+                        con.Close();
+                    }
+
+                }
+            }
+
+        }
+        public List<District> getDistricts()
+        {
+            List<District> districts = new List<District>();
+            using (MySqlConnection con = new MySqlConnection(constr))
+            {
+                string query = @" select * from district;";
                 using (MySqlCommand cmd = new MySqlCommand(query))
                 {
                     using (MySqlCommand newCommand = new MySqlCommand(query))
@@ -33,12 +85,45 @@ namespace TripSafe.Repositories
                         {
                             while (sdr.Read())
                             {
-                                terminals.Add(new Terminal
+                                districts.Add(new District
+                                {
+                                    Id = Convert.ToInt32(sdr["Id"]),
+                                    name = sdr["name"].ToString(),
+
+                                }); ;
+                            }
+                        }
+                        con.Close();
+                    }
+
+                }
+            }
+            return districts;
+        }
+        public List<Object> getTerminals()
+        {
+            List<Object> terminals = new List<Object>();
+            using (MySqlConnection con = new MySqlConnection(constr))
+            {
+                string query = @"SELECT Id, name, districtId,
+                                (select name from district where district.Id=terminal.districtId) as districtName
+                                 FROM bus_management_system.terminal;";
+                using (MySqlCommand cmd = new MySqlCommand(query))
+                {
+                    using (MySqlCommand newCommand = new MySqlCommand(query))
+                    {
+                        newCommand.Connection = con;
+                        con.Open();
+                        using (MySqlDataReader sdr = newCommand.ExecuteReader())
+                        {
+                            while (sdr.Read())
+                            {
+                                terminals.Add(new
                                 {
                                     Id = Convert.ToInt32(sdr["Id"]),
                                     name = sdr["name"].ToString(),
                                     districtId = Convert.ToInt32(sdr["districtId"]),
-                                     
+                                    districtName = sdr["districtName"].ToString(),
                                 }); ;
                             }
                         }
