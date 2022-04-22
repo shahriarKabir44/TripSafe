@@ -7,14 +7,26 @@ using System.Data;
 using System.Configuration;
 using MySql.Data.MySqlClient;
 using TripSafe.Models;
+ 
+using TripSafe.Reposotories;
 
 namespace TripSafe.Controllers
 {
     public class HomeController : Controller
     {
+        private TicketRepository ticketRepository;
+        public HomeController()
+        {
+            ticketRepository = new TicketRepository();
+        }
         public ActionResult Index()
         {
             return View();
+        }
+        [HttpPost]
+        public Object search(int start_terminal, int end_terminal, int arrivalTime, int vacancy)
+        {
+            return Json(ticketRepository.searchBus(start_terminal, end_terminal, arrivalTime, vacancy), JsonRequestBehavior.AllowGet);
         }
     }
 }

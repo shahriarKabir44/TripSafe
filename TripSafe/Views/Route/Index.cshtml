@@ -20,6 +20,7 @@
             <th>Name</th>
             <th>Start terminal</th>
             <th>End terminal</th>
+            <th>Bus name</th>
             <th></th>
         </tr>
         <tr ng-repeat="route in routes">
@@ -27,6 +28,7 @@
             <td>{{route.name}}</td>
             <td>{{route.startTerminalName}}</td>
             <td>{{route.endTerminalName}}</td>
+            <td>{{route.busName}}</td>
             <td>
                 <button ng-click="gotoDetails(route.Id)" class="btn btn-primary">Details</button>
             </td>
