@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
-<body class="container" ng-app="busListModule" ng-controller="busListModule" ng-init="initApp()">
+<body class="container" ng-app="busListModule" ng-controller="busListController" ng-init="initApp()">
     <h2>Bus List</h2>
 
     <div class="modal fade" id="editBus">
@@ -52,7 +52,7 @@
 
 
     let app = angular.module('busListModule', [])
-    app.controller('busListModule', ($scope, $http) => {
+    app.controller('busListController', ($scope, $http) => {
          
         $scope.availableBusList = []
         $scope.selectedBus = {}
