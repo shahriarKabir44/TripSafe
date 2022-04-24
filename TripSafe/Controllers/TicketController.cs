@@ -26,6 +26,8 @@ namespace TripSafe.Controllers
         {
             return View();
         }
+
+
         [HttpGet]
         public Object getDailyBoardingInfo(int day)
         {

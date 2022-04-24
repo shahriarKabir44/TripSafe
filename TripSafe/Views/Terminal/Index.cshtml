@@ -12,8 +12,8 @@
     <h2>Terminal List</h2>
 
     <div class="modal fade" id="addNewModal">
-        <div class="modal-dialog">
-            <div class="modal-content">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content container">
                 <div class="modal-header">
                     <h2>Add terminal</h2>
                 </div>
@@ -29,7 +29,7 @@
                         </select>
                     </div>
 
-                    <button type="submit" class="btn btn-default">Done</button>
+                    <button type="submit" class="btn btn-primary">Done</button>
                 </form>
 
             </div>
@@ -80,14 +80,14 @@
                 })
         }
         $scope.addNew = function () {
-            $http.post('/Terminal/addNew', JSON.stringify($scope.selectedBus))
+            $http.post('/Terminal/addNew', JSON.stringify($scope.newTerminal))
                 .then(({ data }) => {
                     location.reload(true);
                 })
         }
 
         $scope.getDistricts = () => {
-            $http.post('/Terminal/getDistricts', JSON.stringify($scope.selectedBus))
+            $http.get('/Terminal/getDistricts' )
                 .then(({ data }) => {
                     $scope.districts = data
                 })
@@ -95,7 +95,7 @@
 
 
         $scope.initApp = () => {
-            $scope.getAvailableBusList()
+            $scope.getTerminals()
             $scope.getDistricts()
         }
 

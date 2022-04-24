@@ -12,7 +12,7 @@
     <h2>Boarding and unboarding info of every terminal</h2>
 
     <input type="date" ng-model="query" />
-    <button class="btn btn-primary" ng-click="search()">Add new</button>
+    <button class="btn btn-primary" ng-click="search()">Search</button>
 
     <table class="table table-striped">
         <thead>
@@ -39,6 +39,7 @@
         $scope.records = []
         $scope.query = {}
         $scope.getRecords = (day) => {
+            console.log(day)
             $http.get('/Ticket/getDailyBoardingInfo/?day='+day)
                 .then(({ data }) => {
                     
@@ -48,12 +49,12 @@
 
         $scope.search = () => {
             let day = ($scope.query * 1) / (24 * 3600 * 1000);
-            $scope.getRecords(day);
+            $scope.getRecords(Math.floor(day));
         }
 
 
         $scope.initApp = () => {
-            let day = ((new Date()) * 1) / (24 * 3600 * 1000);
+            let day = Math.floor(((new Date()) * 1) / (24 * 3600 * 1000));
             $scope.getRecords(day)
             
         }

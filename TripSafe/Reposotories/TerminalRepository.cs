@@ -26,9 +26,11 @@ namespace TripSafe.Repositories
                                      name ,
                                      districtId )
                                     VALUES
-                                    ( {terminal.name},{terminal.districtId}  );";
+                                    ( ?1,?2 );";
                 using (MySqlCommand cmd = new MySqlCommand(query))
                 {
+                    cmd.Parameters.AddWithValue("?1", terminal.name);
+                    cmd.Parameters.AddWithValue("?2", terminal.districtId);
                     cmd.Connection = con;
                     con.Open();
                     cmd.ExecuteNonQuery();
