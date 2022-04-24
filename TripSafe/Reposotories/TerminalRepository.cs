@@ -31,6 +31,7 @@ namespace TripSafe.Repositories
                 {
                     cmd.Connection = con;
                     con.Open();
+                    cmd.ExecuteNonQuery();
                     con.Close();
                     using (MySqlCommand newCommand = new MySqlCommand("select max(ID) from terminal;"))
                     {
