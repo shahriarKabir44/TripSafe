@@ -31,7 +31,7 @@ namespace TripSafe.Repositories
                         {
                             while (sdr.Read())
                             {
-                                districts.Add(new District
+                                employees.Add(new Employee
                                 {
                                     Id = Convert.ToInt32(sdr["Id"]),
                                     name = sdr["name"].ToString(),
@@ -75,11 +75,11 @@ namespace TripSafe.Repositories
                                 employeeType,
                                 image)
                                 VALUES
-                                (  {employee.name: },
-                                {employee.phone: },
-                                {employee.password: },
-                                {employee.employeeType: },
-                                {employee.image: });";
+                                (  {employee.name },
+                                {employee.phone },
+                                {employee.password },
+                                {employee.employeeType },
+                                {employee.image });";
                 using (MySqlCommand cmd = new MySqlCommand(query))
                 {
                     cmd.Connection = con;

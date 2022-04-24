@@ -12,6 +12,15 @@ using TripSafe.Reposotories;
 
 namespace TripSafe.Controllers
 {
+    public class Query
+    {
+        public int start_terminal { get; set; }
+        public int arrivalTime { get; set; }
+        public int date { get; set; }
+        public int end_terminal { get; set; }
+        public int vacancy { get; set; }
+
+    }
     public class HomeController : Controller
     {
         private TicketRepository ticketRepository;
@@ -24,9 +33,14 @@ namespace TripSafe.Controllers
             return View();
         }
         [HttpPost]
-        public Object search(int start_terminal, int end_terminal, int arrivalTime, int vacancy)
+        public Object search(Query query)
         {
-            return Json(ticketRepository.searchBus(start_terminal, end_terminal, arrivalTime, vacancy), JsonRequestBehavior.AllowGet);
+            return Json(ticketRepository.searchBus(query.start_terminal, query.end_terminal, query.arrivalTime, query.vacancy, query.date), JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public Object purchaseTicket(SearchQuery searchQuery)
+        {
+            return Json(ticketRepository.createTicket(searchQuery));
         }
     }
 }

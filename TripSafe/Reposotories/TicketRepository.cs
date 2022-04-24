@@ -9,6 +9,24 @@ using MySql.Data.MySqlClient;
 
 namespace TripSafe.Reposotories
 {
+    public class ValidRoute
+    {
+        public int Id { get; set; }
+        public int busId { get; set; }
+        public String busName { get; set; }
+        public int bus_cap { get; set; }
+        public int rem_vac { get; set; }
+    }
+    public class route_schedule
+    {
+        public int routeId { get; set; }
+        public String routeName { get; set; }
+        public int busId { get; set; }
+        public int remVacancy { get; set; }
+        public String busName { get; set; }
+        public int terminalId { get; set; }
+    }
+    
     public class TicketRepository
     {
         private string constr;
@@ -17,33 +35,19 @@ namespace TripSafe.Reposotories
         {
             this.constr = ConfigurationManager.ConnectionStrings["connection"].ConnectionString;
         }
-        public Object searchBus(int start_terminal, int end_terminal, int arrivalTime, int vacancy)
+        public Object searchBus(int start_terminal, int end_terminal, int arrivalTime, int vacancy, int day)
         {
-            List<Object> results = new List<Object>();
+            List<ValidRoute> results = new List<ValidRoute>();
             using (MySqlConnection con = new MySqlConnection(constr))
             {
-                string query = $@"with route_bus as
-                             ( select route.name as routeName,
-                             route.id as routeId,
-                            route.busId as busId,
-                            bus.name as busName,
-                            bus.rem_vacancy as remVacancy 
-                            from route,bus  
-                            where bus.Id=route.busId) 
-                            select route_bus.routeId,
-                            route_bus.routeName,route_bus.busId,
-                            route_bus.remVacancy,route_bus.busName,schedule.terminalId
-                            from route_bus,schedule 
-                            where schedule.arrivalTime<={arrivalTime} and 
-                            schedule.terminalId={start_terminal} and 
-                            schedule.routeId=route_bus.routeId and 
-                            route_bus.remVacancy>={vacancy} and 
-                            schedule.routeId in 
-                            (select S.routeId from schedule as S, 
-                            schedule as T  where T.terminalId={start_terminal}
-                            and S.terminalId={end_terminal} 
-                            and S.routeId=T.routeId 
-                            and S.stoppageIndex>T.stoppageIndex);";
+                string query = $@"with route_schedule as(
+	                                select route.Id, route.busId,(select name from bus where bus.Id=route.busId) as busName,
+                                    (select capacity from bus where bus.Id=route.busId ) as bus_cap
+                                    from route,schedule as S , schedule as T
+                                    where S.routeId=route.Id and S.terminalId={start_terminal} and T.terminalId={end_terminal} and S.stoppageIndex< T.stoppageIndex
+                                    and S.arrivalTime<={arrivalTime}
+                                )
+                                select * from route_schedule;";
                 using (MySqlCommand cmd = new MySqlCommand(query))
                 {
                     using (MySqlCommand newCommand = new MySqlCommand(query))
@@ -54,15 +58,15 @@ namespace TripSafe.Reposotories
                         {
                             while (sdr.Read())
                             {
-                                results.Add(new
+                                results.Add(new ValidRoute
                                 {
-                                    routeId = Convert.ToInt32(sdr["routeId"]),
+                                    Id = Convert.ToInt32(sdr["Id"]),
 
-                                    routeName = sdr["routeName"].ToString(),
                                     busId = Convert.ToInt32(sdr["busId"]),
-                                    remVacancy = Convert.ToInt32(sdr["remVacancy"]),
+
                                     busName = sdr["busName"].ToString(),
-                                    terminalId = Convert.ToInt32(sdr["terminalId"]),
+                                    bus_cap = Convert.ToInt32(sdr["bus_cap"]),
+                                    rem_vac = Convert.ToInt32(sdr["bus_cap"])
                                 });
                             }
                         }
@@ -71,7 +75,122 @@ namespace TripSafe.Reposotories
 
                 }
             }
-            return results;
+            List<Object> res = new List<object>();
+            foreach (var data in results)
+            {
+                var info = (getBusList(data, day, vacancy, start_terminal));
+                if (info != null) res.Add(info);
+            }
+
+            return res;
+        }
+        public Object getBusList(ValidRoute validRoute, int day, int minVacancy, int start_terminal)
+        {
+            List<Trip> trip = new List<Trip>();
+            using (MySqlConnection con = new MySqlConnection(constr))
+            {
+                string query = $@"select * from trip 
+                                where trip.routeId={validRoute.Id} and trip.date={day};";
+                using (MySqlCommand newCommand = new MySqlCommand(query))
+                {
+                    newCommand.Connection = con;
+                    con.Open();
+                    using (MySqlDataReader sdr = newCommand.ExecuteReader())
+                    {
+                        while (sdr.Read())
+                        {
+                            trip.Add(new Trip
+                            {
+                                routeId = Convert.ToInt32(sdr["routeId"]),
+
+                                Id = Convert.ToInt32(sdr["Id"]),
+                                driverId = Convert.ToInt32(sdr["driverId"]),
+
+                                date = Convert.ToInt32(sdr["date"])
+                            });
+                        }
+                    }
+                    con.Close();
+                }
+
+            }
+            if (trip.Count == 0)
+            {
+                return validRoute;
+            }
+            else
+            {
+                bool ok = false;
+                bool isValid = (isValidRoute(validRoute, minVacancy, day, start_terminal, trip[0].Id, ref ok));
+                if (isValid) return validRoute;
+                else return null;
+            }
+        }
+
+        public bool isValidRoute(ValidRoute validRoute, int minVacancy, int date, int targetTerminal, int tripId, ref bool isValid)
+        {
+            int passengerCount = 0;
+            Dictionary<int, int> existence = new Dictionary<int, int>();
+            using (MySqlConnection con = new MySqlConnection(constr))
+            {
+                string query = $@"select   schedule.terminalId ,schedule. routeId, schedule.arrivalTime,schedule. departureTime, schedule.stoppageIndex, 
+                                (case 
+		                                when (select sum(ticket.passengerCount) from ticket where ticket.endTerminal=schedule.terminalId) is null then 0
+                                        else (select sum(ticket.passengerCount) from ticket where ticket.endTerminal=schedule.terminalId)
+	                                end ) as unboard_cnt,
+                                (case 
+		                                when (select sum(ticket.passengerCount) from ticket where ticket.startTerminal=schedule.terminalId) is null then 0
+                                        else (select sum(ticket.passengerCount) from ticket where ticket.startTerminal=schedule.terminalId)
+	                                end ) as  board_cnt
+                                 from trip,schedule
+                                 where trip.routeId=schedule.routeId and trip.routeId={validRoute.Id} and trip.Id={tripId} and trip.date={date} order by stoppageIndex;";
+                using (MySqlCommand newCommand = new MySqlCommand(query))
+                {
+                    newCommand.Connection = con;
+                    con.Open();
+                    using (MySqlDataReader sdr = newCommand.ExecuteReader())
+                    {
+                        while (sdr.Read())
+                        {
+                            var info = (new
+                            {
+                                terminalId = Convert.ToInt32(sdr["terminalId"]),
+                                routeId = Convert.ToInt32(sdr["routeId"]),
+                                arrivalTime = Convert.ToInt32(sdr["arrivalTime"]),
+                                departureTime = Convert.ToInt32(sdr["departureTime"]),
+                                stoppageIndex = Convert.ToInt32(sdr["stoppageIndex"]),
+                                unboard_cnt = Convert.ToInt32(sdr["unboard_cnt"]),
+                                board_cnt = Convert.ToInt32(sdr["board_cnt"])
+                            });
+                            if (!existence.ContainsKey(info.terminalId))
+                            {
+                                existence[info.terminalId] = 1;
+                                if (info.terminalId != targetTerminal)
+                                {
+                                    existence[info.terminalId] = 1;
+                                    passengerCount += info.board_cnt;
+                                    passengerCount -= info.unboard_cnt;
+                                }
+                                else
+                                {
+                                    existence[info.terminalId] = 1;
+                                    passengerCount += info.board_cnt;
+                                    passengerCount -= info.unboard_cnt;
+                                    isValid = validRoute.bus_cap - passengerCount >= minVacancy;
+                                    validRoute.rem_vac = validRoute.bus_cap - passengerCount;
+                                    return isValid;
+                                }
+                            }
+                        }
+                    }
+                    con.Close();
+                }
+
+            }
+
+
+            return false;
+
         }
 
         public Object getDailyBoardingUnboardingInfo(int date)
@@ -136,4 +255,216 @@ namespace TripSafe.Reposotories
 
             return data;
         }
+
+        private int searchDriverId(int date)
+        {
+            List<int> employeeIds = new List<int>();
+            string query = $@"select * from employee
+                            where employeeType =2 and employee.Id not in
+                            (select driverId from trip
+                            where date={date});";
+            using (MySqlConnection con = new MySqlConnection(constr))
+            {
+                using (MySqlCommand newCommand = new MySqlCommand(query))
+                {
+                    newCommand.Connection = con;
+                    con.Open();
+                    using (MySqlDataReader sdr = newCommand.ExecuteReader())
+                    {
+                        while (sdr.Read())
+                        {
+                            employeeIds.Add(Convert.ToInt32(sdr["Id"]));
+                        }
+                    }
+                    con.Close();
+                }
+
+            }
+            Random rnd = new Random();
+            return employeeIds[rnd.Next(employeeIds.Count)];
+        }
+
+        private Trip findTrip(int routeId, int date)
+        {
+            string query = $@"select * from trip 
+                                where trip.routeId={routeId} and trip.date={date};";
+            using (MySqlConnection con = new MySqlConnection(constr))
+            {
+                using (MySqlCommand newCommand = new MySqlCommand(query))
+                {
+                    newCommand.Connection = con;
+                    con.Open();
+                    using (MySqlDataReader sdr = newCommand.ExecuteReader())
+                    {
+                        while (sdr.Read())
+                        {
+                            return (new Trip
+                            {
+                                routeId = Convert.ToInt32(sdr["routeId"]),
+
+                                Id = Convert.ToInt32(sdr["Id"]),
+                                driverId = Convert.ToInt32(sdr["driverId"]),
+
+                                date = Convert.ToInt32(sdr["date"])
+                            });
+                        }
+                    }
+                    con.Close();
+                }
+
+            }
+            return createNewTrip(new Trip
+            {
+                routeId = routeId,
+                date = date,
+                driverId = searchDriverId(date)
+            });
+
+
+        }
+
+        private Trip createNewTrip(Trip newTrip)
+        {
+            string query = $@"INSERT INTO trip
+                            (driverId,routeId, date)  VALUES
+                            ( {newTrip.driverId},{newTrip.routeId}  ,  {newTrip.date}  );";
+            using (MySqlConnection con = new MySqlConnection(constr))
+            {
+                using (MySqlCommand newCommand = new MySqlCommand(query))
+                {
+                    newCommand.Connection = con;
+                    con.Open();
+                    newCommand.ExecuteNonQuery();
+                    con.Close();
+
+                }
+                using (MySqlCommand newCommand = new MySqlCommand(" (select max(Id) as Id from trip)"))
+                {
+                    newCommand.Connection = con;
+                    con.Open();
+                    using (MySqlDataReader sdr = newCommand.ExecuteReader())
+                    {
+                        while (sdr.Read())
+                        {
+                            newTrip.Id = Convert.ToInt32(sdr["Id"].ToString());
+                            break;
+                        }
+                    }
+                    con.Close();
+                }
+
+            }
+            return newTrip;
+
+        }
+        private int searchPassenger(String phone, String name)
+        {
+            int passengerId = 0;
+            using (MySqlConnection con = new MySqlConnection(constr))
+            {
+                using (MySqlCommand newCommand = new MySqlCommand($@"select * from user where phoneNumber={phone};"))
+
+                {
+                    newCommand.Connection = con;
+                    con.Open();
+                    using (MySqlDataReader sdr = newCommand.ExecuteReader())
+                    {
+                        while (sdr.Read())
+                        {
+                            passengerId = Convert.ToInt32(sdr["Id"].ToString());
+                        }
+                    }
+                    con.Close();
+                }
+
+            }
+            if (passengerId == 0)
+            {
+                string query = $@"INSERT INTO  user ( phoneNumber,name )
+                            VALUES (?1 ,?2);";
+                           
+                             
+                using (MySqlConnection con = new MySqlConnection(constr))
+                {
+                    using (MySqlCommand newCommand = new MySqlCommand(query))
+                    {
+                        newCommand.Parameters.AddWithValue("?1", phone);
+                        newCommand.Parameters.AddWithValue("?2", name);
+                        newCommand.Connection = con;
+                        con.Open();
+                        newCommand.ExecuteNonQuery();
+                        con.Close();
+
+                    }
+                    using (MySqlCommand newCommand = new MySqlCommand(" (select max(Id) as Id from user)"))
+                    {
+                        newCommand.Connection = con;
+                        con.Open();
+                        using (MySqlDataReader sdr = newCommand.ExecuteReader())
+                        {
+                            while (sdr.Read())
+                            {
+                                passengerId = Convert.ToInt32(sdr["Id"].ToString());
+                                break;
+                            }
+                        }
+                        con.Close();
+                    }
+
+                }
+
+            }
+
+            return passengerId;
+        }
+        public Ticket createTicket(SearchQuery searchQuery)
+        {
+            
+            Trip trip = this.findTrip(searchQuery.routeId, searchQuery.date);
+            int passengerId = searchPassenger(searchQuery.phone, searchQuery.name);
+            Ticket newTicket = new Ticket{
+                passengerId =passengerId,
+                tripId=trip.Id,
+                passengerCount=searchQuery.seats,
+                startTerminal=searchQuery.start_terminal,
+                endTerminal=searchQuery.end_terminal,
+
+            } ;
+            string query = $@"INSERT INTO  ticket ( passengerCount,startTerminal,
+                            endTerminal,passengerId,tripId )
+                            VALUES
+                            ( {searchQuery.seats } ,
+                             {searchQuery.start_terminal  },
+                                {searchQuery.end_terminal },{ passengerId },{trip.Id } );";
+            using (MySqlConnection con = new MySqlConnection(constr))
+            {
+                using (MySqlCommand newCommand = new MySqlCommand(query))
+                {
+                    newCommand.Connection = con;
+                    con.Open();
+                    newCommand.ExecuteNonQuery();
+                    con.Close();
+
+                }
+                using (MySqlCommand newCommand = new MySqlCommand(" (select max(Id) as Id from ticket)"))
+                {
+                    newCommand.Connection = con;
+                    con.Open();
+                    using (MySqlDataReader sdr = newCommand.ExecuteReader())
+                    {
+                        while (sdr.Read())
+                        {
+                            newTicket.Id = Convert.ToInt32(sdr["Id"].ToString());
+                            break;
+                        }
+                    }
+                    con.Close();
+                }
+
+            }
+
+            return newTicket;
+        }
+
     }
+}

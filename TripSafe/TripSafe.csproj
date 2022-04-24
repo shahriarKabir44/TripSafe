@@ -183,6 +183,7 @@
     <Compile Include="Models\Road.cs" />
     <Compile Include="Models\Route.cs" />
     <Compile Include="Models\Schedule.cs" />
+    <Compile Include="Models\SearchQuery.cs" />
     <Compile Include="Models\Terminal.cs" />
     <Compile Include="Models\TerminalConnection.cs" />
     <Compile Include="Models\Ticket.cs" />

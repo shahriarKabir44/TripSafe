@@ -10,6 +10,26 @@
 
 <body class="container" ng-app="homeModule" ng-controller="homeController" ng-init="initApp()">
     <h2>Home</h2>
+    <div class="modal fade" id="addUser">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Update status</h2>
+                </div>
+                <input type="text" placeholder="Name" ng-model="query.name" />
+                <input type="text" placeholder="Phone" ng-model="query.phone" />
+
+                <div class="modal-footer">
+                    <button class="btn btn-success" ng-click="createTicket()">Done!</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
     <form class="form" ng-submit="searchBus()">
         <label for="terminal1">Start from</label>
         <select name="terminal1" id="" ng-model="query.start_terminal">
@@ -23,24 +43,26 @@
         <input type="number" name="arrivaltime" id="" ng-model="query.arrivalTime" />
         <label for="date">Date</label>
         <input type="date" name="date" id="" ng-model="query.date" />
-        <label for="vacancy">vacancy</label>
+        <label for="vacancy">Seats</label>
         <input type="number" name="vacancy" id="" ng-model="query.vacancy" />
         <button type="submit">Search</button>
     </form>
-    <h3  >Search results</h3>
+    <h3>Search results</h3>
     <table class="table table-striped">
         <tr>
             <th>routeName</th>
-            <th>remVacancy</th>
-            <th>busName</th>
+            <th>Remaining seats before arriving</th>
+            <th>Total seats</th>
+            <th>Bus Name</th>
             <th>action</th>
         </tr>
         <tr ng-repeat="result in searchResults">
-            <td>{{result.routeName}}</td>
-            <td>{{result.remVacancy}}</td>
+            <td>{{result.busName}}</td>
+            <td>{{result.rem_vac}}</td>
+            <td>{{result.bus_cap}}</td>
             <td>{{result.busName}}</td>
             <td>
-                <button class="btn btn-primary">Purchase</button>
+                <button class="btn btn-primary" ng-click="purchaseInit(result)">Purchase</button>
             </td>
         </tr>
     </table>
@@ -51,6 +73,7 @@
 
     let app = angular.module('homeModule', [])
     app.controller('homeController', ($scope, $http) => {
+       
         $scope.terminals = []
         $scope.searchResults = []
         $scope.query = {
@@ -66,11 +89,38 @@
                 })
         }
 
-        $scope.searchBus = function () {
+         
 
-            $http.post('/Home/search', JSON.stringify({ ...$scope.query, date: $scope.query.date*1 }))
-                .then(({ data}) => {
-                    $scope.searchResults=data
+        $scope.purchaseInit = function (data) {
+            $scope.query.selectedRoute = data.Id;
+            $('#addUser').modal('show')
+        }
+        $scope.createTicket = function () {
+            $('#addUser').modal('hide')
+            let searchQuery = {
+                phone: $scope.query.phone,
+                name: $scope.query.name,
+                date: Math.floor(($scope.query.date * 1) / (24 * 3600 * 1000)),
+                seats: $scope.query.vacancy,
+                routeId: $scope.query.selectedRoute,
+                start_terminal: $scope.query.start_terminal,
+                end_terminal: $scope.query.end_terminal
+            }
+            $http.post('/Home/purchaseTicket', JSON.stringify(searchQuery))
+                .then(data => {
+                    console.log(data);
+                    alert("purchase done!")
+                })
+           
+        }
+
+        $scope.searchBus = function () {
+            let query = ({ ...$scope.query, date: Math.floor(($scope.query.date * 1) / (24 * 3600 * 1000)) })
+            console.log($scope.query)
+            $http.post('/Home/search', JSON.stringify( query))
+                .then(({ data }) => {
+                    console.log(data)
+                    $scope.searchResults = data
                 })
         }
          
