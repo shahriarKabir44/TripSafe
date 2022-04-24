@@ -47,7 +47,7 @@
                         <th>End to</th>
                     </tr>
                     <tr ng-repeat="ticket in myTickets">
-                        <td>{{ticket.date}} </td>
+                        <td>{{ticket.travel_date}} </td>
                         <td>{{ticket.passengerCount}} </td>
                         <td>{{ticket.passengerName}} </td>
                         <td>{{ticket.passengerPhone}} </td>
@@ -83,7 +83,7 @@
         <input type="number" name="vacancy" id="" ng-model="query.vacancy" />
         <button type="submit">Search</button>
     </form>
-    <button class="btn btn-primary" ng-click="initSearch()">search tickets</button>
+    <button class="btn btn-primary" ng-click="initSearch()">search purchased tickets</button>
     <h3>Search results</h3>
     <table class="table table-striped">
         <tr>
@@ -163,7 +163,7 @@
         $scope.searchBus = function () {
             let query = ({ ...$scope.query, date: Math.floor(($scope.query.date * 1) / (24 * 3600 * 1000)) })
             console.log($scope.query)
-            $http.get('/Home/search', JSON.stringify(query))
+            $http.post('/Home/search', JSON.stringify(query))
                 .then(({ data }) => {
                     console.log(data)
                     $scope.searchResults = data
