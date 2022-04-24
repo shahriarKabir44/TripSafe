@@ -42,5 +42,11 @@ namespace TripSafe.Controllers
         {
             return Json(ticketRepository.createTicket(searchQuery));
         }
+        [HttpGet]
+        public Object getTickets(String phone)
+        {
+            return Json(ticketRepository.getTickets(phone),JsonRequestBehavior.AllowGet);
+
+        }
     }
 }

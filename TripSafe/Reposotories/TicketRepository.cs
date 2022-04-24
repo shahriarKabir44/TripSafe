@@ -26,7 +26,7 @@ namespace TripSafe.Reposotories
         public String busName { get; set; }
         public int terminalId { get; set; }
     }
-    
+
     public class TicketRepository
     {
         private string constr;
@@ -382,8 +382,8 @@ namespace TripSafe.Reposotories
             {
                 string query = $@"INSERT INTO  user ( phoneNumber,name )
                             VALUES (?1 ,?2);";
-                           
-                             
+
+
                 using (MySqlConnection con = new MySqlConnection(constr))
                 {
                     using (MySqlCommand newCommand = new MySqlCommand(query))
@@ -419,17 +419,18 @@ namespace TripSafe.Reposotories
         }
         public Ticket createTicket(SearchQuery searchQuery)
         {
-            
+
             Trip trip = this.findTrip(searchQuery.routeId, searchQuery.date);
             int passengerId = searchPassenger(searchQuery.phone, searchQuery.name);
-            Ticket newTicket = new Ticket{
-                passengerId =passengerId,
-                tripId=trip.Id,
-                passengerCount=searchQuery.seats,
-                startTerminal=searchQuery.start_terminal,
-                endTerminal=searchQuery.end_terminal,
+            Ticket newTicket = new Ticket
+            {
+                passengerId = passengerId,
+                tripId = trip.Id,
+                passengerCount = searchQuery.seats,
+                startTerminal = searchQuery.start_terminal,
+                endTerminal = searchQuery.end_terminal,
 
-            } ;
+            };
             string query = $@"INSERT INTO  ticket ( passengerCount,startTerminal,
                             endTerminal,passengerId,tripId )
                             VALUES
@@ -464,6 +465,57 @@ namespace TripSafe.Reposotories
             }
 
             return newTicket;
+        }
+
+        public List<Object> getTickets(String phone)
+        {
+
+            String query = $@"
+                        select   passengerCount, 
+                        (select name from terminal where terminal.Id= ticket.startTerminal) as start_from,
+                        (select name from terminal where terminal.Id= ticket.endTerminal) as end_to,
+                        (select date from trip where trip.Id=ticket.tripId) as travel_date
+
+                        , endTerminal, 
+                        (select name from user where user.Id=ticket.passengerId) as passengerName,
+                        (select phoneNumber from user where user.Id=ticket.passengerId) as passengerPhone
+
+                        , tripId from
+                        ticket,user 
+                        where ticket.passengerId=user.Id and user.phoneNumber={phone};";
+            List<Object> tickets = new List<object>();
+            using (MySqlConnection con = new MySqlConnection(constr))
+            {
+                using (MySqlCommand cmd = new MySqlCommand(query))
+                {
+
+                    using (MySqlCommand newCommand = new MySqlCommand(query))
+                    {
+                        newCommand.Connection = con;
+                        con.Open();
+                        using (MySqlDataReader sdr = newCommand.ExecuteReader())
+                        {
+                            while (sdr.Read())
+                            {
+                                tickets.Add(new
+                                {
+                                    passengerCount = Convert.ToInt32(sdr["passengerCount"].ToString()),
+                                    start_from = sdr["start_from"].ToString(),
+                                    end_to = sdr["end_to"].ToString(),
+                                    travel_date = Convert.ToInt32(sdr["travel_date"].ToString()),
+
+                                    passengerName = sdr["passengerName"].ToString(),
+                                    passengerPhone = sdr["passengerPhone"].ToString(),
+
+                                });
+                            }
+                        }
+                        con.Close();
+                    }
+                }
+
+            }
+            return tickets;
         }
 
     }

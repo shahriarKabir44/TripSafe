@@ -28,7 +28,43 @@
         </div>
     </div>
 
+    <div class="modal fade" id="searchTicket">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Update status</h2>
+                </div>
 
+                <input type="text" placeholder="Phone" ng-model="ticketSearchPhone" />
+                <h4>Search result</h4>
+                <table class=" table table-striped">
+                    <tr>
+                        <th>Date</th>
+                        <th>Passengers</th>
+                        <th>Passenger name</th>
+                        <th>passenger phone</th>
+                        <th>Start from</th>
+                        <th>End to</th>
+                    </tr>
+                    <tr ng-repeat="ticket in myTickets">
+                        <td>{{ticket.date}} </td>
+                        <td>{{ticket.passengerCount}} </td>
+                        <td>{{ticket.passengerName}} </td>
+                        <td>{{ticket.passengerPhone}} </td>
+                        <td>{{ticket.start_from}} </td>
+                        <td>{{ticket.end_to}} </td>
+                    </tr>
+                </table>
+
+
+                <div class="modal-footer">
+                    <button class="btn btn-success" ng-click="searchPurchased()">search!</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
     <form class="form" ng-submit="searchBus()">
         <label for="terminal1">Start from</label>
@@ -47,6 +83,7 @@
         <input type="number" name="vacancy" id="" ng-model="query.vacancy" />
         <button type="submit">Search</button>
     </form>
+    <button class="btn btn-primary" ng-click="initSearch()">search tickets</button>
     <h3>Search results</h3>
     <table class="table table-striped">
         <tr>
@@ -73,7 +110,7 @@
 
     let app = angular.module('homeModule', [])
     app.controller('homeController', ($scope, $http) => {
-       
+
         $scope.terminals = []
         $scope.searchResults = []
         $scope.query = {
@@ -88,8 +125,17 @@
                     $scope.terminals = (data)
                 })
         }
+        $scope.initSearch = function () {
+            $('#searchTicket').modal('show')
+        }
 
-         
+        $scope.searchPurchased = function () {
+            $http.get('/Home/getTickets/?phone=' + $scope.ticketSearchPhone)
+                .then(({ data }) => {
+                    $scope.myTickets = data
+                    console.log(data)
+                })
+        }
 
         $scope.purchaseInit = function (data) {
             $scope.query.selectedRoute = data.Id;
@@ -111,19 +157,19 @@
                     console.log(data);
                     alert("purchase done!")
                 })
-           
+
         }
 
         $scope.searchBus = function () {
             let query = ({ ...$scope.query, date: Math.floor(($scope.query.date * 1) / (24 * 3600 * 1000)) })
             console.log($scope.query)
-            $http.post('/Home/search', JSON.stringify( query))
+            $http.get('/Home/search', JSON.stringify(query))
                 .then(({ data }) => {
                     console.log(data)
                     $scope.searchResults = data
                 })
         }
-         
+
 
         $scope.initApp = function () {
             $scope.getTerminals()
