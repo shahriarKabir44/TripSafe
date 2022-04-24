@@ -33,5 +33,17 @@ namespace TripSafe.Controllers
         {
             return Json(ticketRepository.getDailyBoardingUnboardingInfo(day),JsonRequestBehavior.AllowGet);
         }
+
+        [HttpGet]
+        public ActionResult DailyTickets(int day)
+        {
+           return Json(ticketRepository.getDailyTickets(day), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public Object getDailyTicketPurchases()
+        {
+             return View();
+        }
     }
 }

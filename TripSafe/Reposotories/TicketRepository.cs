@@ -518,5 +518,51 @@ namespace TripSafe.Reposotories
             return tickets;
         }
 
+    
+        public List<Object> getDailyTickets(int day)
+        {
+            String query = $@" select   passengerCount, 
+                        (select name from terminal where terminal.Id= ticket.startTerminal) as start_from,
+                        (select name from terminal where terminal.Id= ticket.endTerminal) as end_to,
+                        (select date from trip where trip.Id=ticket.tripId) as travel_date,
+                        (select name from user where user.Id=ticket.passengerId) as passengerName,
+                        (select phoneNumber from user where user.Id=ticket.passengerId) as passengerPhone, tripId from
+                        ticket,user ,trip
+                        where ticket.passengerId=user.Id and trip.Id=ticket.tripId and trip.date={day};";
+            List<Object> tickets = new List<object>();
+            using (MySqlConnection con = new MySqlConnection(constr))
+            {
+                using (MySqlCommand cmd = new MySqlCommand(query))
+                {
+
+                    using (MySqlCommand newCommand = new MySqlCommand(query))
+                    {
+                        newCommand.Connection = con;
+                        con.Open();
+                        using (MySqlDataReader sdr = newCommand.ExecuteReader())
+                        {
+                            while (sdr.Read())
+                            {
+                                tickets.Add(new
+                                {
+                                    passengerCount = Convert.ToInt32(sdr["passengerCount"].ToString()),
+                                    start_from = sdr["start_from"].ToString(),
+                                    end_to = sdr["end_to"].ToString(),
+                                    travel_date = Convert.ToInt32(sdr["travel_date"].ToString()),
+
+                                    passengerName = sdr["passengerName"].ToString(),
+                                    passengerPhone = sdr["passengerPhone"].ToString(),
+
+                                });
+                            }
+                        }
+                        con.Close();
+                    }
+                }
+
+            }
+            return tickets;
+        }
+    
     }
 }

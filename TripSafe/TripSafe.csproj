@@ -250,6 +250,7 @@
     <Content Include="Views\Employee\Index.cshtml" />
     <Content Include="Views\Accidents\Index.cshtml" />
     <Content Include="Views\Ticket\dailyBoardingInfo.cshtml" />
+    <Content Include="Views\Ticket\getDailyTicketPurchases.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
