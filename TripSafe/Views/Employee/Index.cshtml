@@ -47,13 +47,7 @@
                 <td>{{employee.name}}</td>
                 <td>{{employee.phone}}</td>
                 <td>
-                    <select ng-model="employee.employeeType" disabled>
-                        <option value="1">Admin</option>
-                        <option value="2">Mechanic</option>
-                        <option value="3">Terminal Manager</option>
-
-
-                    </select>
+                    {{employee.designation}}
                 </td>
                 <td>
                     <button class="btn btn-danger" ng-click="delete(employee)">Delete</button>
@@ -66,8 +60,8 @@
 <script>
 
 
-    let app = angular.module('busListModule', [])
-    app.controller('busListModule', ($scope, $http) => {
+    let app = angular.module('employeeListModule', [])
+    app.controller('employeeController', ($scope, $http) => {
         $scope.currentEmployee = {}
         
         $scope.employees = []
@@ -105,6 +99,11 @@
         $scope.getEmployees = () => {
             $http.get('/Employee/getAll')
                 .then(({ data }) => {
+                    for (let employee of data) {
+                        if (employee.employeeType == 1) employee.designation = "admin"
+                        else if (employee.employeeType == 2) employee.designation = "Mechanic"
+                        else employee.designation = "Terminal Manager"
+                    }
                     $scope.employees = data;
                     console.log(data)
                 })

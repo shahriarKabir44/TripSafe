@@ -338,7 +338,7 @@ namespace TripSafe.Reposotories
                     con.Close();
 
                 }
-                using (MySqlCommand newCommand = new MySqlCommand(" (select max(Id) as Id from trip)"))
+                using (MySqlCommand newCommand = new MySqlCommand(" (select max(Id) as Id from trip);"))
                 {
                     newCommand.Connection = con;
                     con.Open();

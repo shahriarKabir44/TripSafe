@@ -97,6 +97,7 @@ namespace TripSafe.Repositories
                 {
                     newCommand.Connection = con;
                     con.Open();
+                    newCommand.ExecuteNonQuery();
                     con.Close();
                 }
 
