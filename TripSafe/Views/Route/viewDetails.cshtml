@@ -2,6 +2,7 @@
 @{
     var routeId = ViewBag.routeId;
     var busId = ViewBag.busId;
+    var routeName = ViewBag.routeInfo;
 }
 <!DOCTYPE html>
 <head>
@@ -13,7 +14,7 @@
 </head>
 
 <body class="container" ng-app="nodeModule" ng-controller="nodeController" ng-init="initApp()">
-    <h2>@ViewBag.routeInfo.name</h2>
+    <h2>{{routeName}} </h2>
 
     <h4>Bus info:</h4>
     <table class="table table-striped">
@@ -53,19 +54,26 @@
 <script>
     var routeId =@routeId ;
     var busId=@busId;
-    
+    var routeName="@routeName";
     let app = angular.module('nodeModule', [])
     app.controller('nodeController', ($scope, $http) => {
-        
+
         $scope.schedules = []
         $scope.currentBus = {}
         $scope.routeId = -1
-        $scope.busId=-1
+        $scope.busId = -1
+        $scope.routeDetails = {}
        $scope.initApp = () => {
            $scope.routeId = routeId;
            $scope.busId = busId
+           $scope.routeName = routeName
            $scope.getNodes()
            $scope.findBus()
+           console.log(routeId)
+           $http.get('/Route/getRouteInfo/?routeId=' + routeId)
+               .then(({ data}) => {
+                   console.log(data)
+               })
         }
         $scope.convertTime = function (time) {
             return Math.floor(time / 60) + ":" + Math.floor(time%60)
@@ -87,7 +95,7 @@
                     $scope.schedules = data;
                 })
         }
-         
+
     })
 </script>
 

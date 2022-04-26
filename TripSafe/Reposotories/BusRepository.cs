@@ -92,9 +92,11 @@ namespace TripSafe.Repositories
         {
             using (MySqlConnection con = new MySqlConnection(constr))
             {
-                using (MySqlCommand newCommand = new MySqlCommand($@"update bus set status={bus.status}
-                                    where bus.id = {bus.Id}; "))
+                using (MySqlCommand newCommand = new MySqlCommand($@"update bus set status=?1
+                                    where bus.id = ?2; "))
                 {
+                    newCommand.Parameters.AddWithValue("?1", bus.status);
+                    newCommand.Parameters.AddWithValue("?2", bus.Id);
                     newCommand.Connection = con;
                     con.Open();
                     newCommand.ExecuteNonQuery();

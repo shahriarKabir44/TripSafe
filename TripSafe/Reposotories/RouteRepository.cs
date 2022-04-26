@@ -20,7 +20,7 @@ namespace TripSafe.Repositories
             Route route = new Route();
             using (MySqlConnection con = new MySqlConnection(constr))
             {
-                string query = "select * from route;";
+                string query = $"select * from route where route.Id={routeId};";
                 using (MySqlCommand cmd = new MySqlCommand(query))
                 {
                     using (MySqlCommand newCommand = new MySqlCommand(query))
@@ -55,11 +55,11 @@ namespace TripSafe.Repositories
             List<Object> routes = new List<Object>();
             using (MySqlConnection con = new MySqlConnection(constr))
             {
-                string query = @"select route.Id,name,busId, 
+                string query = $@"select route.Id,name,busId, 
                                 (select name from bus where bus.id= route.busId) as busName, 
                                 (select name from terminal where terminal.Id = route.start_terminal) as startTerminalName, 
                                 (select name from terminal where terminal.Id = route.end_terminal) as endTerminalName, 
-                                route.start_terminal, route.end_terminal from route;";
+                                route.start_terminal, route.end_terminal from route ;";
                 using (MySqlCommand cmd = new MySqlCommand(query))
                 {
                     using (MySqlCommand newCommand = new MySqlCommand(query))

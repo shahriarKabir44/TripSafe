@@ -27,7 +27,7 @@ namespace TripSafe.Controllers
             Route routeInfo = routeRepository.findRoute(routeId);
             ViewBag.routeId = routeId;
             ViewBag.busId = routeInfo.busId;
-            ViewBag.routeInfo = routeInfo;
+            ViewBag.routeInfo = routeInfo.name;
             return View();
         }
         public object getRoutes()
@@ -45,6 +45,11 @@ namespace TripSafe.Controllers
         {
             Route data = routeRepository.create(newRoute);
             return Json(data, JsonRequestBehavior.AllowGet);
+        }
+        [HttpGet]
+        public Object getRouteInfo(int routeId)
+        {
+            return Json(routeRepository.findRoute(routeId), JsonRequestBehavior.AllowGet);
         }
     }
 }

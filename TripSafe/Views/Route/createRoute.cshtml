@@ -79,7 +79,7 @@
 
 <script>
 
-
+    var terminals=[]
     let app = angular.module('routeModule', [])
     app.controller('routeController', ($scope, $http) => {
         $scope.newRoad = { name: "", length: 0 }
@@ -168,7 +168,7 @@
                     return Promise.all(promises)
                 })
                 .then(() => {
-                    location.href ="Route/Index"
+                    location.reload(true)
                 })
         }
 
@@ -235,7 +235,7 @@
         $scope.getTerminals = () => {
             $http.get('/Terminal/getTerminals')
                 .then(({ data }) => {
-
+                    terminals = data;
                     $scope.terminals = data;
                     console.log(data)
                 })
