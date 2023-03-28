@@ -6,9 +6,18 @@ A bus service management system that can be used to both manage resources, emplo
   3. Issue an accident record
   
 ## Features for users:
-  1. Find available bus list to reach destination.
-  2. Purchase tickets.
-  3. View purchase history.
-  4. Issue an accident record
+  <ol>
+    <li>Find available bus list to reach destination.</li>
+    <li>View purchase history.</li>
+    <li>Issue an accident record</li>
+  </ol>
+ 
   
-## Technologies used: ASP.NET, AngularJs, Bootstrap, MySQL
+## Technologies used: 
+<ol>
+    <liASP.NET</li>
+    <li>AngularJs</li>
+    <li>Bootstrap</li>
+    <li>MySQL</li>
+  </ol>
+
