@@ -15,7 +15,7 @@ A bus service management system that can be used to both manage resources, emplo
   
 ## Technologies used: 
 <ol>
-    <liASP.NET</li>
+    <li>ASP.NET</li>
     <li>AngularJs</li>
     <li>Bootstrap</li>
     <li>MySQL</li>
